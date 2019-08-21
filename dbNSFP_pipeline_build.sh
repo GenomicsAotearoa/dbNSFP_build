@@ -16,7 +16,7 @@ WORKINGDIR="/data/"
 
 # Check that working directory exists 
 if [ -d ${WORKINGDIR} ] ; then 
-	echo "Found outdir...we're going to need a lot of free space, does it have more than 50GB free?"
+	echo "Found outdir...we're going to need a lot of free space, does it have more than 100GB free?"
 else
 	echo "Please create ${WORKINGDIR} before continuing" 
 	exit 
