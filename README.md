@@ -22,7 +22,7 @@ docker run -it -v ${INPUTDIR}:/data dbnsfp
 ## Changelog
 
 * [Initial Version as Gist](https://gist.github.com/sirselim/dcaad07523c90b46c1c0685efbc5d04e)
-* August 22, 2019
+* August 22, 2019 - Jonah 
   - Build a Docker container with dependencies
   - Output some amount of progress feedback
   - Read the number of threads from the cpu count in /proc/cpuinfo (so assumes linux/not MacOS, ok for inside containers).
