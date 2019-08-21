@@ -10,7 +10,7 @@ MD5SUM=d64479862d5c69cdaad80f077a4ad791
 #TODO: add an option to 'scrape' this from the url to always return latest version
 
 # define thread number for parallel processing where able
-THREADS=6
+THREADS=$(cat /proc/cpuinfo |grep processor | wc -l) # Note: autodetect threads
 WORKINGDIR="/data/dbNSFP"
 
 # Check that working directory exists 
