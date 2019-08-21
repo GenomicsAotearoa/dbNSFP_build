@@ -18,3 +18,15 @@ docker build -t dbnsfp .
 docker run -it -v ${INPUTDIR}:/data dbnsfp
 
 ```
+
+## Changelog
+
+* [Initial Version as Gist](https://gist.github.com/sirselim/dcaad07523c90b46c1c0685efbc5d04e)
+* August 22, 2019
+  - Output some amount of progress feedback
+  - Read the number of threads from the cpu count in /proc/cpuinfo (so assumes linux/not MacOS, ok for inside containers).
+  - I removed the -S 20G memory allocation as it won’t work gracefully on machines with less memory 
+  - Using functions in the BASH script to organise things a bit better 
+  - Switched to Aria2c (vs wget) so I can have 5 download channels at once (faster download). Google Drive hosting is HEAPS faster, but the URLs are craptastic. 
+  - Sketching out some MD5 sum checking
+  - Doing a few tests to prevent re-downloading the 25GB file, but downloading it it isn’t present
