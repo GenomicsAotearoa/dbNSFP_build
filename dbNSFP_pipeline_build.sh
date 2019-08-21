@@ -7,6 +7,7 @@
 # Set to dbNSFP version to download and build
 version="4.0a"
 MD5SUM=d64479862d5c69cdaad80f077a4ad791
+#TODO: check MD5 Sum before proceeding
 #TODO: add an option to 'scrape' this from the url to always return latest version
 
 # define thread number for parallel processing where able
