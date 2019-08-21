@@ -6,26 +6,59 @@
 
 # Set to dbNSFP version to download and build
 version="4.0a"
+MD5SUM=d64479862d5c69cdaad80f077a4ad791
 #TODO: add an option to 'scrape' this from the url to always return latest version
+
 # define thread number for parallel processing where able
 THREADS=6
+WORKINGDIR="/data/dbNSFP"
 
-# Download dbNSFP database
-wget -O dbNSFP${version}.zip "ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFP${version}.zip"
+# Check that working directory exists 
+if [ -d ${WORKINGDIR} ] ; then 
+	echo "Found outdir...we're going to need a lot of free space, does it have more than 50GB free?"
+else
+	echo "Please create ${WORKINGDIR} before continuing" 
+	exit 
+fi
 
+
+download() { 
+	
+	# Download dbNSFP database using aria2c with 5 connections 
+	aria2c -o dbNSFP${version}.zip -x 5 "ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFP${version}.zip"
+
+}
+
+do_prep() {
+
+	decompress
+	extract_header
+	custom_build_hg38
+	custom_build_hg19
+
+}
+
+decompress() { 
+
+echo "Uncompressing...."
 # Uncompress
 unzip dbNSFP${version}.zip
 
+}
+
+extract_header() { 
 # grab header
 zcat dbNSFP${version}_variant.chr1.gz | head -n 1 | bgzip > header.gz
 
+}
+
+custom_build_hg38() {
 ### this section will produce data for hg38 capable pipelines
 ## hg38 version
 
 # Create a single file version
 # NOTE: bgzip parameter -@ X represents number of threads
-cat dbNSFP${version}_variant.chr{1..22}.gz dbNSFP${version}_variant.chrX.gz dbNSFP${version}_variant.chrY.gz dbNSFP${version}_variant.chrM.gz | zgrep -v '#chr' | bgzip -@ ${THREADS} > dbNSFPv${version}_custom.gz
-#TODO: there must be a 'nicer' way of ordering the input into the cat (to include the X,Y and M chrs without explicitly stating them)
+cat dbNSFP${version}_variant.*.gz | zgrep -v '#chr' | bgzip -@ ${THREADS} > dbNSFPv${version}_custom.gz
 
 # add header back into file
 cat header.gz dbNSFPv${version}_custom.gz > dbNSFPv${version}_custombuild.gz
@@ -42,7 +75,9 @@ tabix -s 1 -b 2 -e 2 dbNSFPv${version}_custombuild.gz
 #TODO: add clean up step to rm all intermediate files after testing confirmed working (i.e. correct annotation 'rates')
 #/END hg38
 ###
+}
 
+custom_build_hg19() {
 ### this section will produce data for hg19 capable pipelines
 ## hg19 version
 # for hg19 (coordinate data is located in columns 8 [chr] and 9 [position])
@@ -53,6 +88,21 @@ zcat dbNSFPv${version}_custombuild.gz | awk '$8 != "."' | awk 'BEGIN{FS=OFS="\t"
 
 # Create tabix index
 tabix -s 1 -b 2 -e 2 dbNSFPv${version}.hg19.custombuild.gz
+}
+
+
+if [ -f ${WORKINGDIR}/dbNSFP${version}.zip ] ; then
+	echo "Found file, extracting..." 	
+	cd ${WORKINGDIR}
+	do_prep
+	
+else
+	echo "Didn't find file, downloading, this could take awhile"
+	cd ${WORKINGDIR}
+	download
+	do_prep	
+fi
+
 
 # test hg19 annotation
 # java -jar ~/install/snpEff/SnpSift.jar dbnsfp -v -db /mnt/dbNSFP/hg19/dbNSFPv${version}.hg19.custombuild.gz test/chr1_test.vcf > test/chr1_test_anno.vcf
