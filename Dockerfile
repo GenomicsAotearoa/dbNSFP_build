@@ -10,4 +10,4 @@ COPY dbNSFP_pipeline_build.sh /opt/scripts/
 
 WORKDIR /data
 
-ENTRYPOINT /bin/bash
+ENTRYPOINT /opt/scripts/dbNSFP_pipeline_build.sh
