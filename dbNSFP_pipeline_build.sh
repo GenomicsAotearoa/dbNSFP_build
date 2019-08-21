@@ -87,7 +87,11 @@ custom_build_hg19() {
 # for hg19 (coordinate data is located in columns 8 [chr] and 9 [position])
 # this takes output from above, filters out any variants with no hg19 coords and then sorts on hg19 chr and position, and then bgzips output
 # NOTE: bgzip parameter -@ X represents number of threads
-zcat dbNSFPv${version}_custombuild.gz | awk '$8 != "."' | awk 'BEGIN{FS=OFS="\t"} {$1=$8 && $2=$9; NF--}1'| LC_ALL=C sort --parallel=${THREADS} -T . -V -k 1,1 -k 2,2 | bgzip -@ ${THREADS} > dbNSFPv${version}.hg19.custombuild.gz
+zcat dbNSFPv${version}_custombuild.gz | \
+  awk '$8 != "."' | \
+  awk 'BEGIN{FS=OFS="\t"} {$1=$8 && $2=$9; NF--}1'| \
+  LC_ALL=C sort --parallel=${THREADS} -n -S 20G -T . -k 1,1 -k 2,2 --compress-program=gzip | \
+  bgzip -@ ${THREADS} > dbNSFPv${version}.hg19.custombuild.gz
 # NOTE: removed target memory allocation  
 
 # Create tabix index
