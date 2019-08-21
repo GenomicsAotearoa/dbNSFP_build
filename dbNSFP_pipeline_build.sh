@@ -42,17 +42,20 @@ decompress() {
 
 echo "Uncompressing...."
 # Uncompress
-unzip dbNSFP${version}.zip
-
+unzip -n dbNSFP${version}.zip
+# Note: skip existing so it runs fast if re-run
 }
 
 extract_header() { 
 # grab header
+echo "Extracting header..."
 zcat dbNSFP${version}_variant.chr1.gz | head -n 1 | bgzip > header.gz
 
 }
 
 custom_build_hg38() {
+
+echo "Building hg38 version..."
 ### this section will produce data for hg38 capable pipelines
 ## hg38 version
 
@@ -83,8 +86,8 @@ custom_build_hg19() {
 # for hg19 (coordinate data is located in columns 8 [chr] and 9 [position])
 # this takes output from above, filters out any variants with no hg19 coords and then sorts on hg19 chr and position, and then bgzips output
 # NOTE: bgzip parameter -@ X represents number of threads
-zcat dbNSFPv${version}_custombuild.gz | awk '$8 != "."' | awk 'BEGIN{FS=OFS="\t"} {$1=$8 && $2=$9; NF--}1'| LC_ALL=C sort --parallel=${THREADS} -S 20G -T . -V -k 1,1 -k 2,2 | bgzip -@ ${THREADS} > dbNSFPv${version}.hg19.custombuild.gz
-# NOTE: to try and overcome disk space limits giving sort 20Gb of RAM
+zcat dbNSFPv${version}_custombuild.gz | awk '$8 != "."' | awk 'BEGIN{FS=OFS="\t"} {$1=$8 && $2=$9; NF--}1'| LC_ALL=C sort --parallel=${THREADS} -T . -V -k 1,1 -k 2,2 | bgzip -@ ${THREADS} > dbNSFPv${version}.hg19.custombuild.gz
+# NOTE: removed target memory allocation  
 
 # Create tabix index
 tabix -s 1 -b 2 -e 2 dbNSFPv${version}.hg19.custombuild.gz
