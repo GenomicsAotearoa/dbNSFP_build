@@ -11,7 +11,7 @@ MD5SUM=d64479862d5c69cdaad80f077a4ad791
 
 # define thread number for parallel processing where able
 THREADS=$(cat /proc/cpuinfo |grep processor | wc -l) # Note: autodetect threads
-WORKINGDIR="/data/dbNSFP"
+WORKINGDIR="/data/"
 
 # Check that working directory exists 
 if [ -d ${WORKINGDIR} ] ; then 
