@@ -62,13 +62,17 @@ echo "Building hg38 version..."
 
 # Create a single file version
 # NOTE: bgzip parameter -@ X represents number of threads
-cat dbNSFP${version}_variant.*.gz | zgrep -v '#chr' | bgzip -@ ${THREADS} > dbNSFPv${version}_custom.gz
+if [ -f dbNSFPv${version}_custom.gz ] ; then
+	echo "Found hg38, skipping..."
+else
+	cat dbNSFP${version}_variant.*.gz | zgrep -v '#chr' | bgzip -@ ${THREADS} > dbNSFPv${version}_custom.gz
 
-# add header back into file
-cat header.gz dbNSFPv${version}_custom.gz > dbNSFPv${version}_custombuild.gz
+	# add header back into file
+	cat header.gz dbNSFPv${version}_custom.gz > dbNSFPv${version}_custombuild.gz
 
-# Create tabix index
-tabix -s 1 -b 2 -e 2 dbNSFPv${version}_custombuild.gz
+	# Create tabix index
+	tabix -s 1 -b 2 -e 2 dbNSFPv${version}_custombuild.gz
+fi
 
 # test annotation
 # java -jar ~/install/snpEff/SnpSift.jar dbnsfp -v -db /mnt/dbNSFP/hg19/dbNSFPv${version}_custombuild.gz test/chr1_test.vcf > test/chr1_test_anno.vcf
@@ -87,15 +91,22 @@ custom_build_hg19() {
 # for hg19 (coordinate data is located in columns 8 [chr] and 9 [position])
 # this takes output from above, filters out any variants with no hg19 coords and then sorts on hg19 chr and position, and then bgzips output
 # NOTE: bgzip parameter -@ X represents number of threads
+echo "Building hg19 version..."
+
+if [ -f dbNSFPv${version}.hg19.custombuild.gz ]; then
+	echo "Found hg19, skipping..."
+else
 zcat dbNSFPv${version}_custombuild.gz | \
   awk '$8 != "."' | \
   awk 'BEGIN{FS=OFS="\t"} {$1=$8 && $2=$9; NF--}1'| \
-  LC_ALL=C sort --parallel=${THREADS} -n -S 20G -T . -k 1,1 -k 2,2 --compress-program=gzip | \
+  LC_ALL=C sort --parallel=${THREADS} -n -S 4G -T . -k 1,1 -k 2,2 --compress-program=gzip | \
   bgzip -@ ${THREADS} > dbNSFPv${version}.hg19.custombuild.gz
 # NOTE: removed target memory allocation  
 
 # Create tabix index
 tabix -s 1 -b 2 -e 2 dbNSFPv${version}.hg19.custombuild.gz
+fi 
+
 }
 
 
