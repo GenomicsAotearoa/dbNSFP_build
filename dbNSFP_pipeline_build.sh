@@ -1,8 +1,8 @@
 #!/bin/bash
 ## small bash script to download and reformat dbNSFP for pipeline 
-## Miles Benton
+## Miles Benton adapted to run in Docker by Jonah Duckles
 ## created: 2018-01-13
-## modified: 2019-08-21
+## modified: 2019-08-24
 
 # Set to dbNSFP version to download and build
 version="4.0a"
