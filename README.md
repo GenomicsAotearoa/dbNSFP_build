@@ -9,7 +9,7 @@ The script will look for the zip file `dbNSFP4.0a.zip` and will not download it 
 **Note:** if you make changes to the `Dockerfile` or script, you'll need to rebuild the container.  
 
 ```
-git clone https://github.com/jduckles/dbNSFP_build
+git clone https://github.com/genomicsaotearoa/dbNSFP_build
 cd dbNSFP_build
 INPUTDIR=/data/dbSNFP # Set this to a location with 100GB+ free
 docker build -t dbnsfp .
