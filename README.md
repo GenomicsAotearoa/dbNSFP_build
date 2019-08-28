@@ -1,6 +1,8 @@
 # Download and Format dbNSFP 
 
-This docker container is a workflow to download and prepare a dbNSFP database dump for usage in annotating outputs of other pipelines. It targets dbNSFP Version 4.0a for now with plans to update as new versions are released.
+This docker container is a workflow to download and prepare a [dbNSFP database](https://sites.google.com/site/jpopgen/dbNSFP) dump for usage in annotating outputs of other pipelines. It targets dbNSFP Version 4.0a for now with plans to update as new versions are released.
+
+Two copies of the Database are made, one for hg19 and one for hg38. The downloaded database is 25GB and each reference genome version is also 25GB, so you'll need > 75GB of storage to build the two new versions. Once built an index file for tabix is created allowing for remote querying of the database.  
 
 ## Usage
 
